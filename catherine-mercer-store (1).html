@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catherine Mercer — Elite Sales Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dim: #8B6914;
+    --black: #0A0A0A;
+    --black-soft: #111111;
+    --black-card: #141414;
+    --black-border: #1E1E1E;
+    --white: #FAF8F4;
+    --white-dim: #C8C4BC;
+    --white-muted: #7A7672;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── EARLY BIRD BANNER ── */
+  #earlybird-bar {
+    background: var(--gold);
+    color: var(--black);
+    text-align: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    position: relative;
+    z-index: 101;
+  }
+  #earlybird-bar span { color: var(--black-soft); font-weight: 700; }
+  .spots-remaining {
+    display: inline-block;
+    background: var(--black);
+    color: var(--gold);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    margin-left: 0.75rem;
+    font-weight: 700;
+  }
+
+  /* ── CURSOR ── */
+  .cursor { width:8px; height:8px; background:var(--gold); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; transition:transform 0.15s ease; }
+  .cursor-ring { width:32px; height:32px; border:1px solid rgba(201,168,76,0.4); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; transition:transform 0.08s ease; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-track { background:var(--black); }
+  ::-webkit-scrollbar-thumb { background:var(--gold-dim); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; width: 100%; z-index: 100;
+    padding: 1.5rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+  }
+  .logo { font-family:'Cormorant Garamond',serif; line-height:1; letter-spacing:0.02em; }
+  .logo-catherine { font-size:1.3rem; font-style:italic; font-weight:300; color:var(--gold); display:block; }
+  .logo-mercer { font-size:1.05rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--white); display:block; }
+  .nav-links { display:flex; gap:2.5rem; align-items:center; }
+  .nav-links a { text-decoration:none; color:var(--white-dim); font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; font-weight:400; transition:color 0.3s; }
+  .nav-links a:hover { color:var(--gold); }
+  .nav-cta { background:transparent; border:1px solid var(--gold); color:var(--gold) !important; padding:0.6rem 1.4rem; font-size:0.68rem !important; letter-spacing:0.18em !important; transition:background 0.3s, color 0.3s !important; }
+  .nav-cta:hover { background:var(--gold) !important; color:var(--black) !important; }
+
+  /* ── HERO ── */
+  #hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:6rem 2rem 4rem; position:relative; overflow:hidden; }
+  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% 60%, rgba(201,168,76,0.06) 0%, transparent 70%); pointer-events:none; }
+  .hero-line-top { position:absolute; top:0; left:50%; transform:translateX(-50%); width:1px; height:120px; background:linear-gradient(to bottom, transparent, var(--gold)); }
+  .hero-ornament { font-family:'Cormorant Garamond',serif; font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:2.5rem; opacity:0.8; }
+  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(3.5rem,8vw,7rem); font-weight:300; line-height:1.05; letter-spacing:-0.01em; margin-bottom:1.5rem; color:var(--white); }
+  .hero-title em { font-style:italic; color:var(--gold); font-weight:300; }
+  .hero-sub { font-size:0.82rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--white-muted); max-width:480px; margin:0 auto 2rem; font-weight:400; line-height:2; }
+
+  /* ── EARLY BIRD HERO BADGE ── */
+  .eb-hero-badge {
+    display: inline-flex; align-items: center; gap: 1.5rem;
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 1rem 2rem;
+    margin-bottom: 2.5rem;
+    background: rgba(201,168,76,0.04);
+  }
+  .eb-price-old { font-size:0.9rem; text-decoration:line-through; color:var(--white-muted); }
+  .eb-price-new { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--gold); font-weight:300; line-height:1; }
+  .eb-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--white-dim); }
+  .eb-divider { width:1px; height:40px; background:rgba(201,168,76,0.2); }
+  .eb-spots { text-align:left; }
+  .eb-spots-num { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--gold); display:block; line-height:1; }
+  .eb-spots-label { font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--white-muted); }
+
+  .hero-cta-group { display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .btn-primary { display:inline-block; background:var(--gold); color:var(--black); padding:1rem 2.5rem; text-decoration:none; font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase; font-weight:600; font-family:'Montserrat',sans-serif; transition:background 0.3s, transform 0.2s; border:none; cursor:pointer; }
+  .btn-primary:hover { background:var(--gold-light); transform:translateY(-2px); }
+  .btn-ghost { display:inline-block; background:transparent; color:var(--white-dim); padding:1rem 2.5rem; text-decoration:none; font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase; font-weight:400; border:1px solid rgba(255,255,255,0.15); transition:border-color 0.3s, color 0.3s; }
+  .btn-ghost:hover { border-color:var(--gold); color:var(--gold); }
+  .hero-scroll { position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+  .hero-scroll span { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--white-muted); }
+  .scroll-line { width:1px; height:50px; background:linear-gradient(to bottom, var(--gold), transparent); animation:scrollDrop 2s ease-in-out infinite; }
+  @keyframes scrollDrop { 0%,100%{opacity:0;transform:scaleY(0);transform-origin:top}50%{opacity:1;transform:scaleY(1);transform-origin:top} }
+
+  /* ── COUNTDOWN ── */
+  #countdown-section {
+    background: var(--black-soft);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  .countdown-label { font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; }
+  .countdown-timer { display:flex; gap:2rem; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .countdown-unit { text-align:center; }
+  .countdown-num { font-family:'Cormorant Garamond',serif; font-size:3.5rem; font-weight:300; color:var(--white); line-height:1; display:block; }
+  .countdown-lbl { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--white-muted); }
+  .countdown-sep { font-family:'Cormorant Garamond',serif; font-size:3rem; color:var(--gold-dim); margin-bottom:0.5rem; }
+  .spots-bar-wrap { max-width:500px; margin:2rem auto 0; }
+  .spots-bar-label { display:flex; justify-content:space-between; font-size:0.68rem; color:var(--white-muted); letter-spacing:0.1em; margin-bottom:0.6rem; }
+  .spots-bar { height:3px; background:var(--black-border); position:relative; }
+  .spots-bar-fill { height:100%; background:var(--gold); transition:width 1s ease; }
+
+  /* ── SECTIONS ── */
+  section { padding:7rem 4rem; }
+  .section-label { font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,4vw,3.5rem); font-weight:300; line-height:1.15; color:var(--white); margin-bottom:1.5rem; }
+  .section-title em { font-style:italic; color:var(--gold); }
+  .divider { width:60px; height:1px; background:var(--gold); margin:2rem auto; }
+
+  /* ── MANIFESTO ── */
+  #manifesto { max-width:900px; margin:0 auto; text-align:center; padding:7rem 2rem; }
+  .manifesto-quote { font-family:'Cormorant Garamond',serif; font-size:clamp(1.5rem,3vw,2.4rem); font-weight:300; font-style:italic; line-height:1.6; color:var(--white); margin:2rem 0; }
+  .manifesto-body { font-size:0.88rem; color:var(--white-dim); max-width:640px; margin:0 auto; line-height:2; letter-spacing:0.02em; }
+
+  /* ── PROBLEMS ── */
+  #problems { background:var(--black-soft); border-top:1px solid var(--black-border); border-bottom:1px solid var(--black-border); padding:5rem 4rem; }
+  .problems-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2px; margin-top:3rem; }
+  .problem-item { padding:2.5rem 2rem; border:1px solid var(--black-border); background:var(--black-card); position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .problem-item::before { content:''; position:absolute; top:0; left:0; width:3px; height:0; background:var(--gold); transition:height 0.4s ease; }
+  .problem-item:hover { border-color:rgba(201,168,76,0.3); }
+  .problem-item:hover::before { height:100%; }
+  .problem-number { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; color:rgba(201,168,76,0.15); line-height:1; margin-bottom:1rem; }
+  .problem-title { font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:0.75rem; font-weight:500; }
+  .problem-desc { font-size:0.82rem; color:var(--white-muted); line-height:1.8; }
+
+  /* ── STORE ── */
+  #store { background:var(--black); }
+  .store-header { text-align:center; margin-bottom:5rem; }
+
+  /* ── EARLY BIRD CALLOUT ── */
+  .eb-callout {
+    border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(201,168,76,0.04);
+    padding: 1.5rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .eb-callout-left { display:flex; align-items:center; gap:1.5rem; }
+  .eb-tag { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); background:rgba(201,168,76,0.1); padding:0.4rem 0.8rem; border:1px solid rgba(201,168,76,0.3); }
+  .eb-callout-text { font-size:0.82rem; color:var(--white-dim); }
+  .eb-callout-text strong { color:var(--gold); font-weight:500; }
+  .eb-callout-price { text-align:right; }
+  .eb-callout-price .old { font-size:0.8rem; text-decoration:line-through; color:var(--white-muted); }
+  .eb-callout-price .new { font-family:'Cormorant Garamond',serif; font-size:2.2rem; color:var(--gold); line-height:1; }
+  .eb-callout-price .save { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold-dim); }
+
+  /* FEATURE PRODUCT */
+  .product-feature { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--black-border); margin-bottom:3rem; position:relative; overflow:hidden; }
+  .product-feature::after { content:''; position:absolute; inset:0; border:1px solid rgba(201,168,76,0.0); transition:border-color 0.4s; pointer-events:none; }
+  .product-feature:hover::after { border-color:rgba(201,168,76,0.25); }
+  .product-visual { background:var(--black-card); display:flex; align-items:center; justify-content:center; min-height:520px; padding:4rem; border-right:1px solid var(--black-border); position:relative; overflow:hidden; }
+  .product-visual-inner { text-align:center; }
+  .product-badge-large { width:200px; height:200px; border:1px solid rgba(201,168,76,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 2rem; position:relative; }
+  .product-badge-large::before { content:''; position:absolute; inset:8px; border:1px solid rgba(201,168,76,0.15); border-radius:50%; }
+  .product-badge-text { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-style:italic; color:var(--gold); line-height:1.3; padding:1rem; }
+  .pillars-list { list-style:none; text-align:left; }
+  .pillars-list li { font-size:0.75rem; color:var(--white-muted); padding:0.5rem 0; border-bottom:1px solid var(--black-border); display:flex; align-items:center; gap:1rem; }
+  .pillars-list li:last-child { border-bottom:none; }
+  .pillar-num { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold-dim); min-width:20px; }
+  .product-info { padding:4rem; display:flex; flex-direction:column; justify-content:space-between; background:var(--black-soft); }
+  .product-tag { font-size:0.6rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem; }
+  .product-tag::after { content:''; flex:1; height:1px; background:rgba(201,168,76,0.2); }
+  .product-name { font-family:'Cormorant Garamond',serif; font-size:2.8rem; font-weight:300; line-height:1.1; color:var(--white); margin-bottom:0.5rem; }
+  .product-name em { font-style:italic; color:var(--gold); }
+  .product-subtitle { font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--white-muted); margin-bottom:2rem; }
+  .product-desc { font-size:0.85rem; color:var(--white-dim); line-height:2; margin-bottom:2rem; }
+  .benefit-list { list-style:none; margin-bottom:2.5rem; }
+  .benefit-list li { font-size:0.8rem; color:var(--white-dim); padding:0.6rem 0; display:flex; align-items:flex-start; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .benefit-list li::before { content:'—'; color:var(--gold); flex-shrink:0; margin-top:0.05rem; }
+  .price-block { margin-bottom:2rem; }
+  .price-original { font-size:0.75rem; text-decoration:line-through; color:var(--white-muted); letter-spacing:0.1em; margin-bottom:0.3rem; }
+  .price-current { font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:300; color:var(--gold); line-height:1; }
+  .price-savings { display:inline-block; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.3rem 0.7rem; margin-top:0.5rem; }
+  .price-note { font-size:0.65rem; color:var(--white-muted); letter-spacing:0.12em; text-transform:uppercase; margin-top:0.6rem; }
+  .checkout-btn { display:block; width:100%; background:var(--gold); color:var(--black); border:none; padding:1.2rem 2rem; font-family:'Montserrat',sans-serif; font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; font-weight:600; cursor:pointer; transition:background 0.3s, transform 0.2s; margin-bottom:0.75rem; text-align:center; text-decoration:none; }
+  .checkout-btn:hover { background:var(--gold-light); transform:translateY(-1px); }
+  .secure-note { font-size:0.62rem; color:var(--white-muted); letter-spacing:0.1em; text-align:center; }
+  .secure-note span { color:var(--gold); }
+
+  /* INDIVIDUAL PRODUCTS */
+  .products-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1px; background:var(--black-border); margin-top:2rem; }
+  .product-card { background:var(--black-card); padding:3rem 2.5rem; position:relative; overflow:hidden; transition:background 0.3s; cursor:pointer; }
+  .product-card:hover { background:#181818; }
+  .product-card::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1px; background:var(--gold); transition:width 0.4s ease; }
+  .product-card:hover::after { width:100%; }
+  .card-number { font-family:'Cormorant Garamond',serif; font-size:4rem; font-weight:300; color:rgba(201,168,76,0.08); position:absolute; top:1.5rem; right:2rem; line-height:1; }
+  .card-tag { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; }
+  .card-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:300; line-height:1.2; color:var(--white); margin-bottom:0.5rem; }
+  .card-desc { font-size:0.78rem; color:var(--white-muted); line-height:1.8; margin-bottom:2rem; }
+  .card-price-block { margin-bottom:1.5rem; }
+  .card-price-old { font-size:0.72rem; text-decoration:line-through; color:var(--white-muted); }
+  .card-price { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--gold); }
+  .card-btn { display:block; border:1px solid rgba(201,168,76,0.4); color:var(--gold); padding:0.75rem 1.5rem; font-family:'Montserrat',sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; background:transparent; cursor:pointer; transition:background 0.3s, color 0.3s; width:100%; text-align:center; text-decoration:none; }
+  .card-btn:hover { background:var(--gold); color:var(--black); }
+
+  /* ── SOCIAL PROOF ── */
+  #proof { background:var(--black-soft); border-top:1px solid var(--black-border); border-bottom:1px solid var(--black-border); text-align:center; }
+  .testimonials { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1px; background:var(--black-border); margin-top:4rem; text-align:left; }
+  .testimonial { background:var(--black-card); padding:3rem 2.5rem; }
+  .stars { color:var(--gold); font-size:0.75rem; letter-spacing:0.1em; margin-bottom:1.5rem; }
+  .testimonial-text { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-style:italic; color:var(--white-dim); line-height:1.7; margin-bottom:2rem; }
+  .testimonial-author { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); }
+  .testimonial-role { font-size:0.68rem; color:var(--white-muted); margin-top:0.25rem; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(8px); }
+  .modal-overlay.active { display:flex; }
+  .modal { background:var(--black-soft); border:1px solid rgba(201,168,76,0.2); width:90%; max-width:560px; max-height:90vh; overflow-y:auto; position:relative; }
+  .modal-header { padding:2.5rem 2.5rem 1.5rem; border-bottom:1px solid var(--black-border); }
+  .modal-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; color:var(--white); margin-bottom:0.3rem; }
+  .modal-subtitle { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); }
+  .modal-body { padding:2.5rem; }
+  .modal-close { position:absolute; top:1.5rem; right:1.5rem; background:none; border:none; color:var(--white-muted); font-size:1.5rem; cursor:pointer; line-height:1; transition:color 0.2s; }
+  .modal-close:hover { color:var(--gold); }
+
+  /* ── EARLY BIRD IN MODAL ── */
+  .modal-eb-strip {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 0.8rem 1.2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; gap: 0.5rem;
+  }
+  .modal-eb-strip span { font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); }
+  .modal-eb-strip strong { color:var(--white); }
+
+  .form-group { margin-bottom:1.5rem; }
+  .form-label { display:block; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--white-muted); margin-bottom:0.6rem; }
+  .form-input { width:100%; background:var(--black-card); border:1px solid var(--black-border); color:var(--white); padding:0.9rem 1rem; font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:300; outline:none; transition:border-color 0.3s; }
+  .form-input:focus { border-color:rgba(201,168,76,0.5); }
+  .form-input::placeholder { color:var(--white-muted); }
+  .card-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+  /* ── STRIPE ELEMENT ── */
+  .stripe-element-wrap { background:var(--black-card); border:1px solid var(--black-border); padding:0.9rem 1rem; transition:border-color 0.3s; }
+  .stripe-element-wrap.focused { border-color:rgba(201,168,76,0.5); }
+
+  .order-summary { background:var(--black-card); border:1px solid var(--black-border); padding:1.5rem; margin-bottom:2rem; }
+  .order-line { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--white-dim); padding:0.4rem 0; }
+  .order-line.strike span:last-child { text-decoration:line-through; color:var(--white-muted); }
+  .order-line.saving { color:var(--gold); font-size:0.72rem; }
+  .order-line.total { border-top:1px solid rgba(201,168,76,0.2); margin-top:0.75rem; padding-top:0.75rem; color:var(--gold); font-weight:500; font-size:0.88rem; }
+  .pay-btn { display:block; width:100%; background:var(--gold); border:none; color:var(--black); padding:1.2rem; font-family:'Montserrat',sans-serif; font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; font-weight:600; cursor:pointer; transition:background 0.3s; }
+  .pay-btn:hover { background:var(--gold-light); }
+  .pay-btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .payment-icons { display:flex; gap:0.75rem; align-items:center; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
+  .payment-icons span { font-size:0.6rem; color:var(--white-muted); letter-spacing:0.1em; text-transform:uppercase; }
+
+  /* ── SUCCESS ── */
+  .success-screen { display:none; text-align:center; padding:3rem 2.5rem; }
+  .success-screen.active { display:block; }
+  .success-icon { font-family:'Cormorant Garamond',serif; font-size:4rem; color:var(--gold); margin-bottom:1.5rem; }
+  .success-title { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; color:var(--white); margin-bottom:1rem; }
+  .success-desc { font-size:0.82rem; color:var(--white-dim); line-height:1.9; }
+
+  /* ── FOOTER ── */
+  footer { padding:5rem 4rem 3rem; background:var(--black-soft); border-top:1px solid var(--black-border); }
+  .footer-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:3rem; flex-wrap:wrap; padding-bottom:3rem; border-bottom:1px solid var(--black-border); margin-bottom:2rem; }
+  .footer-brand .logo-catherine { font-size:1.5rem; }
+  .footer-brand .logo-mercer { font-size:1.1rem; }
+  .footer-brand p { font-size:0.78rem; color:var(--white-muted); max-width:280px; margin-top:1rem; line-height:1.8; }
+  .footer-links h4 { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; font-weight:500; }
+  .footer-links a { display:block; text-decoration:none; color:var(--white-muted); font-size:0.78rem; margin-bottom:0.75rem; transition:color 0.3s; }
+  .footer-links a:hover { color:var(--white); }
+  .footer-bottom { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+  .footer-bottom p { font-size:0.68rem; color:var(--white-muted); letter-spacing:0.08em; }
+  .footer-bottom a { color:var(--gold); text-decoration:none; }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--gold); color:var(--black); padding:1rem 2rem; font-size:0.75rem; letter-spacing:0.1em; font-weight:500; transform:translateY(120px); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index:2000; }
+  .toast.show { transform:translateY(0); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+  .fade-up { opacity:0; animation:fadeUp 0.8s ease forwards; }
+  .delay-1 { animation-delay:0.15s; }
+  .delay-2 { animation-delay:0.3s; }
+  .delay-3 { animation-delay:0.45s; }
+  .delay-4 { animation-delay:0.6s; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px) {
+    nav { padding:1.5rem 1.5rem; }
+    .nav-links { gap:1.5rem; }
+    section { padding:5rem 1.5rem; }
+    .product-feature { grid-template-columns:1fr; }
+    .product-visual { border-right:none; border-bottom:1px solid var(--black-border); min-height:300px; }
+    footer { padding:3rem 1.5rem 2rem; }
+    #problems { padding:4rem 1.5rem; }
+    .eb-callout { flex-direction:column; }
+  }
+  @media(max-width:600px) {
+    .nav-links { display:none; }
+    .hero-title { font-size:2.8rem; }
+    .card-row { grid-template-columns:1fr; }
+    .eb-hero-badge { flex-direction:column; gap:0.75rem; }
+    .eb-divider { width:60px; height:1px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- EARLY BIRD BANNER -->
+<div id="earlybird-bar">
+  ✦ Early Bird Access — First 500 Spots Only &nbsp;·&nbsp; Save $700 Today
+  <span class="spots-remaining" id="bannerSpots">473 spots left</span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <span class="logo-catherine">Catherine</span>
+    <span class="logo-mercer">Mercer</span>
+  </div>
+  <div class="nav-links">
+    <a href="#manifesto">About</a>
+    <a href="#store">The Vault</a>
+    <a href="#proof">Results</a>
+    <a href="#store" class="nav-cta" onclick="openModal('bundle'); return false;">Claim Early Bird</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line-top"></div>
+  <p class="hero-ornament fade-up">Elite Sales Architecture · The 1% Methodology</p>
+  <h1 class="hero-title fade-up delay-1">
+    Close Without<br><em>Chasing.</em><br>Scale Without<br>Doubt.
+  </h1>
+  <p class="hero-sub fade-up delay-2">The complete psychological infrastructure for premium closers who command conviction — not commissions.</p>
+
+  <div class="eb-hero-badge fade-up delay-2">
+    <div>
+      <div class="eb-label">Early Bird Price</div>
+      <div style="display:flex;align-items:baseline;gap:0.75rem;margin-top:0.3rem;">
+        <span class="eb-price-old">$1,200</span>
+        <span class="eb-price-new">$500</span>
+      </div>
+    </div>
+    <div class="eb-divider"></div>
+    <div class="eb-spots">
+      <span class="eb-spots-num" id="heroSpots">473</span>
+      <span class="eb-spots-label">of 500 spots remaining</span>
+    </div>
+  </div>
+
+  <div class="hero-cta-group fade-up delay-3">
+    <button class="btn-primary" onclick="openModal('bundle')">Claim Your Spot — $500</button>
+    <a href="#manifesto" class="btn-ghost">The Philosophy</a>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<div id="countdown-section">
+  <p class="countdown-label">Early Bird Pricing Ends In</p>
+  <div class="countdown-timer">
+    <div class="countdown-unit"><span class="countdown-num" id="cd-days">02</span><span class="countdown-lbl">Days</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-hours">14</span><span class="countdown-lbl">Hours</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-mins">37</span><span class="countdown-lbl">Minutes</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-secs">00</span><span class="countdown-lbl">Seconds</span></div>
+  </div>
+  <div class="spots-bar-wrap">
+    <div class="spots-bar-label">
+      <span>Spots Claimed</span>
+      <span id="spotsClaimedLabel">27 of 500</span>
+    </div>
+    <div class="spots-bar">
+      <div class="spots-bar-fill" id="spotsBarFill" style="width:5.4%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MANIFESTO -->
+<section id="manifesto">
+  <p class="section-label">The Standard</p>
+  <div class="divider"></div>
+  <blockquote class="manifesto-quote">"The highest-paid closers in the world don't sell. They guide the buyer to the only logical conclusion — that investing is the only way forward."</blockquote>
+  <div class="divider"></div>
+  <p class="manifesto-body">Catherine Mercer's methodology is built on one principle: when you understand the psychology of your buyer at the cellular level, price becomes irrelevant. Objections dissolve before they surface. Ghosting becomes impossible. This is not sales training. This is the architecture of the elite.</p>
+</section>
+
+<!-- PROBLEMS -->
+<section id="problems">
+  <div style="max-width:1200px;margin:0 auto;">
+    <p class="section-label">The Problems We Eliminate</p>
+    <h2 class="section-title">What's Keeping You<br>From <em>The Top</em></h2>
+    <div class="problems-grid">
+      <div class="problem-item">
+        <div class="problem-number">01</div>
+        <div class="problem-title">The Low-Ticket Trap</div>
+        <p class="problem-desc">Acting like a low-status vendor chasing small invoices instead of commanding premium investments as a trusted strategic advisor.</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-number">02</div>
+        <div class="problem-title">The Ghosting Phenomenon</div>
+        <p class="problem-desc">Leads disappearing mid-conversation because you're guessing instead of using proven frameworks to pre-emptively neutralize objections.</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-number">03</div>
+        <div class="problem-title">The Commodity Dynamic</div>
+        <p class="problem-desc">Buyers fixated on price because you haven't shifted the conversation from product cost to the devastating cost of their inaction.</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-number">04</div>
+        <div class="problem-title">Internal Self-Sabotage</div>
+        <p class="problem-desc">Performance panic, imposter syndrome, and the Upper Limit Problem destroying your closing power precisely when it matters most.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORE -->
+<section id="store">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="store-header">
+      <p class="section-label">The Vault</p>
+      <h2 class="section-title">Invest in Your<br><em>Architecture</em></h2>
+      <div class="divider"></div>
+      <p style="font-size:0.84rem;color:var(--white-muted);max-width:500px;margin:0 auto;">Choose the complete system or begin with the pillar that addresses your most urgent friction.</p>
+    </div>
+
+    <!-- EARLY BIRD CALLOUT -->
+    <div class="eb-callout">
+      <div class="eb-callout-left">
+        <span class="eb-tag">⚡ Early Bird</span>
+        <div class="eb-callout-text">
+          First <strong>500 spots</strong> only — lock in <strong>$700 in savings</strong> before this offer closes forever. <span id="calloutSpots" style="color:var(--gold);">473 spots remaining.</span>
+        </div>
+      </div>
+      <div class="eb-callout-price">
+        <div class="old">Full price: $1,200</div>
+        <div class="new">$500</div>
+        <div class="save">You save $700</div>
+      </div>
+    </div>
+
+    <!-- BUNDLE PRODUCT -->
+    <div class="product-feature">
+      <div class="product-visual">
+        <div class="product-visual-inner">
+          <div class="product-badge-large">
+            <div class="product-badge-text">The 1%<br>Close</div>
+          </div>
+          <p style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:1.5rem;">4-Part Vault Included</p>
+          <ul class="pillars-list">
+            <li><span class="pillar-num">I</span> The Psychology of Sales & High-Ticket Closing</li>
+            <li><span class="pillar-num">II</span> The Mind-Reader Framework</li>
+            <li><span class="pillar-num">III</span> The Buyer-First Playbook</li>
+            <li><span class="pillar-num">IV</span> The Breakthrough Blueprint</li>
+          </ul>
+          <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--black-border);">
+            <p style="font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">+ Early Bird Bonuses</p>
+            <ul class="pillars-list">
+              <li><span class="pillar-num" style="color:var(--gold);">B1</span> High-Ticket Scripts & Templates Workbook</li>
+              <li><span class="pillar-num" style="color:var(--gold);">B2</span> 30-Day High-Ticket Launch Accelerator</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="product-info">
+        <div>
+          <div class="product-tag">Complete System · Most Popular</div>
+          <h2 class="product-name">The <em>1% Close</em></h2>
+          <p class="product-subtitle">4-Part Digital PDF Playbook Bundle & Interactive Workspace Vault</p>
+          <p class="product-desc">The complete architectural system to eliminate business friction and command premium investments. Four core digital playbooks packed with 5-minute action drills, script templates, and checklists — to install elite sales mechanics into your daily operations immediately.</p>
+          <ul class="benefit-list">
+            <li>Install the Trusted Advisor Frame to position yourself as an indispensable strategic partner</li>
+            <li>The 1-10 Commitment Scale to pull out the raw truth from every lead</li>
+            <li>The PITCH Method to pre-emptively neutralize every objection before it surfaces</li>
+            <li>Strategic Gap Analysis to anchor focus on cost of inaction — never product price</li>
+            <li>Daily neuro-resets to eradicate imposter syndrome and performance panic</li>
+            <li>Instant digital access — start implementing within the hour</li>
+          </ul>
+
+          <!-- EARLY BIRD BONUSES -->
+          <div style="border:1px solid rgba(201,168,76,0.25);background:rgba(201,168,76,0.03);padding:1.5rem 2rem;margin-bottom:2rem;">
+            <div style="font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;">
+              ⚡ Early Bird Exclusive Bonuses
+              <span style="flex:1;height:1px;background:rgba(201,168,76,0.2);display:block;"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+              <div style="display:flex;align-items:flex-start;gap:1rem;">
+                <div style="min-width:28px;height:28px;border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--gold);flex-shrink:0;">B1</div>
+                <div>
+                  <div style="font-size:0.78rem;color:var(--white);font-weight:500;margin-bottom:0.2rem;">The High-Ticket Sales Scripts & Templates Workbook</div>
+                  <div style="font-size:0.7rem;color:var(--white-muted);">Word-for-word scripts, objection handlers, and plug-and-play templates for every stage of your high-ticket sales conversation.</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:1rem;">
+                <div style="min-width:28px;height:28px;border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--gold);flex-shrink:0;">B2</div>
+                <div>
+                  <div style="font-size:0.78rem;color:var(--white);font-weight:500;margin-bottom:0.2rem;">The 30-Day High-Ticket Launch Accelerator</div>
+                  <div style="font-size:0.7rem;color:var(--white-muted);">A day-by-day execution roadmap to generate your first (or next) $10,000+ month within 30 days of starting.</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,0.1);font-size:0.65rem;color:var(--white-muted);letter-spacing:0.1em;text-transform:uppercase;">Bonuses delivered instantly with your purchase · Early Bird access only</div>
+          </div>
+
+        </div>
+        <div>
+          <div class="price-block">
+            <div class="price-original">Full investment: $1,200</div>
+            <div class="price-current">$500</div>
+            <div class="price-savings">Early Bird — You Save $700</div>
+            <div class="price-note">One-time investment · Lifetime access · First 500 only</div>
+          </div>
+          <button class="checkout-btn" onclick="openModal('bundle')">Claim Early Bird Access — $500</button>
+          <p class="secure-note">🔒 <span>256-bit SSL · Powered by Stripe</span> · Instant delivery · All major cards accepted</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDIVIDUAL PRODUCTS -->
+    <p style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--white-muted);text-align:center;margin:4rem 0 0.5rem;">Or invest in a single pillar</p>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="card-number">I</div>
+        <div class="card-tag">Pillar One</div>
+        <h3 class="card-title">The Psychology of Sales & High-Ticket Closing</h3>
+        <p class="card-desc">Master the emotion-to-logic mapping system that moves buyers from desire to decision — without pressure or manipulation.</p>
+        <div class="card-price-block">
+          <div class="card-price">$300</div>
+        </div>
+        <a href="#" class="card-btn" onclick="openModal('p1'); return false;">Invest Now</a>
+      </div>
+      <div class="product-card">
+        <div class="card-number">II</div>
+        <div class="card-tag">Pillar Two</div>
+        <h3 class="card-title">The Mind-Reader Framework</h3>
+        <p class="card-desc">Master audience intelligence to understand exactly what your buyer needs before they articulate it — and close before competition appears.</p>
+        <div class="card-price-block">
+          <div class="card-price">$300</div>
+        </div>
+        <a href="#" class="card-btn" onclick="openModal('p2'); return false;">Invest Now</a>
+      </div>
+      <div class="product-card">
+        <div class="card-number">III</div>
+        <div class="card-tag">Pillar Three</div>
+        <h3 class="card-title">The Buyer-First Playbook</h3>
+        <p class="card-desc">A consultative script vault and template library that positions you as the obvious, inevitable choice for premium buyers.</p>
+        <div class="card-price-block">
+          <div class="card-price">$300</div>
+        </div>
+        <a href="#" class="card-btn" onclick="openModal('p3'); return false;">Invest Now</a>
+      </div>
+      <div class="product-card">
+        <div class="card-number">IV</div>
+        <div class="card-tag">Pillar Four</div>
+        <h3 class="card-title">The Breakthrough Blueprint</h3>
+        <p class="card-desc">Entrepreneurial mindset architecture to dismantle every internal block standing between you and consistent high-ticket closes.</p>
+        <div class="card-price-block">
+          <div class="card-price">$300</div>
+        </div>
+        <a href="#" class="card-btn" onclick="openModal('p4'); return false;">Invest Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section id="proof">
+  <div style="max-width:1200px;margin:0 auto;">
+    <p class="section-label">Results</p>
+    <h2 class="section-title">What The <em>1%</em> Are Saying</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I closed a $24,000 deal in my third week using the PITCH Method. I had been leaving money on the table for two years. This changed everything."</p>
+        <div class="testimonial-author">Dominique A.</div>
+        <div class="testimonial-role">Business Consultant, London</div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"The Mind-Reader Framework alone is worth 10x the investment. I finally understand my buyers at a level that makes my competitors completely irrelevant."</p>
+        <div class="testimonial-author">Marcus T.</div>
+        <div class="testimonial-role">Executive Coach, New York</div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I went from $5k months to $47k in 60 days. The Strategic Gap Analysis completely shifted how I position my offers. No more price objections."</p>
+        <div class="testimonial-author">Priya M.</div>
+        <div class="testimonial-role">Agency Founder, Dubai</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:linear-gradient(135deg,#0f0f0f 0%,#141200 50%,#0f0f0f 100%);text-align:center;padding:7rem 2rem;border-top:1px solid rgba(201,168,76,0.15);">
+  <p class="section-label">The Decision</p>
+  <h2 class="section-title">The 1% Don't Wait.<br>They <em>Decide.</em></h2>
+  <div class="divider"></div>
+  <p style="font-size:0.84rem;color:var(--white-muted);max-width:500px;margin:0 auto 1.5rem;line-height:2;">Every day without the right architecture is a day you're leaving premium revenue on the table. Your buyers are ready. Are you?</p>
+  <p style="font-size:0.75rem;color:var(--gold);letter-spacing:0.15em;margin-bottom:2.5rem;" id="ctaSpots">⚡ 473 early bird spots remaining at $500</p>
+  <button class="btn-primary" onclick="openModal('bundle')">Claim Your Spot — $500 Early Bird</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <span class="logo-catherine">Catherine</span>
+        <span class="logo-mercer">Mercer</span>
+      </div>
+      <p>Elite sales architecture for high-ticket closers committed to building authority, commanding premium, and scaling with certainty.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Vault</h4>
+      <a href="#" onclick="openModal('bundle'); return false;">The 1% Close — Complete Bundle</a>
+      <a href="#" onclick="openModal('p1'); return false;">The Psychology of Sales</a>
+      <a href="#" onclick="openModal('p2'); return false;">The Mind-Reader Framework</a>
+      <a href="#" onclick="openModal('p3'); return false;">The Buyer-First Playbook</a>
+      <a href="#" onclick="openModal('p4'); return false;">The Breakthrough Blueprint</a>
+    </div>
+    <div class="footer-links">
+      <h4>Info</h4>
+      <a href="#manifesto">About Catherine</a>
+      <a href="#proof">Client Results</a>
+      <a href="mailto:thecatherinemercer@gmail.com">thecatherinemercer@gmail.com</a>
+      <a href="https://instagram.com/thecatherinemercer" target="_blank">Instagram — @thecatherinemercer</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Purchase</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Catherine Mercer. All rights reserved.</p>
+    <p>Secure payments via <a href="https://gumroad.com" target="_blank">Gumroad</a> · <span style="color:var(--white-muted);">256-bit SSL encryption</span></p>
+  </div>
+</footer>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="checkoutForm">
+      <div class="modal-header">
+        <div class="modal-subtitle" id="modalProductTag">Complete Bundle</div>
+        <div class="modal-title" id="modalProductName">The 1% Close</div>
+      </div>
+      <div class="modal-body">
+
+        <!-- EARLY BIRD STRIP -->
+        <div class="modal-eb-strip" id="modal-eb-strip">
+          <span>⚡ Early Bird Price Active</span>
+          <span><strong id="modalSpotsLeft">473 spots left</strong></span>
+        </div>
+
+        <div class="order-summary">
+          <div class="order-line strike" id="orderOriginal"><span id="orderOriginalLabel">The 1% Close — Complete Bundle</span><span id="orderOriginalPrice">$1,200</span></div>
+          <div class="order-line saving"><span>Early Bird Discount</span><span id="orderDiscount">−$700</span></div>
+          <div class="order-line" id="bonusRow1" style="color:var(--gold);font-size:0.72rem;"><span>+ Bonus: Scripts & Templates Workbook</span><span style="color:var(--white-muted);">Free</span></div>
+          <div class="order-line" id="bonusRow2" style="color:var(--gold);font-size:0.72rem;"><span>+ Bonus: 30-Day Launch Accelerator</span><span style="color:var(--white-muted);">Free</span></div>
+          <div class="order-line total"><span>Total Today</span><span id="totalAmount">$500</span></div>
+        </div>
+
+        <p style="font-size:0.82rem;color:var(--white-dim);line-height:1.9;margin-bottom:1.5rem;text-align:center;">
+          You're one step away from the complete vault. Click below to complete your secure purchase — payment is handled by Gumroad and your files are delivered to your inbox instantly.
+        </p>
+
+        <a id="gumroadBtn" href="https://thecatherinemercer.gumroad.com/l/ekvvpl" target="_blank" class="checkout-btn" style="display:block;text-align:center;text-decoration:none;">
+          Complete Secure Purchase — <span id="payAmount">$500</span>
+        </a>
+
+        <div class="payment-icons">
+          <span>🔒 Secured by</span>
+          <span style="color:var(--gold);font-weight:500;">Gumroad</span>
+          <span>· Visa · Mastercard · Amex · PayPal</span>
+        </div>
+        <p style="font-size:0.6rem;color:var(--white-muted);text-align:center;margin-top:0.75rem;letter-spacing:0.08em;">Payment processed securely · Files delivered instantly to your inbox · No account required.</p>
+      </div>
+    </div>
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✦</div>
+      <div class="success-title">Welcome to the 1%</div>
+      <p class="success-desc">
+        Your investment has been confirmed.<br>
+        Check your inbox — your complete vault is on its way.<br><br>
+        <span style="color:var(--gold);font-weight:500;">Included in your delivery:</span><br>
+        <span id="successItems"></span><br><br>
+        <span style="color:var(--gold);">You made the decision that separates the elite from the average.</span><br><br>
+        Questions? <a href="mailto:thecatherinemercer@gmail.com" style="color:var(--gold);">thecatherinemercer@gmail.com</a><br>
+        Follow the journey: <a href="https://instagram.com/thecatherinemercer" target="_blank" style="color:var(--gold);">@thecatherinemercer</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+  requestAnimationFrame(animRing);
+})();
+
+// ── SPOTS COUNTER ──
+// Starts at 473 and slowly ticks down to create urgency
+let spotsLeft = parseInt(localStorage.getItem('cm_spots') || '473');
+function updateSpots(){
+  document.getElementById('heroSpots').textContent = spotsLeft;
+  document.getElementById('bannerSpots').textContent = spotsLeft + ' spots left';
+  document.getElementById('calloutSpots').textContent = spotsLeft + ' spots remaining.';
+  document.getElementById('ctaSpots').textContent = '⚡ ' + spotsLeft + ' early bird spots remaining at $500';
+  document.getElementById('modalSpotsLeft').textContent = spotsLeft + ' spots left';
+  const claimed = 500 - spotsLeft;
+  document.getElementById('spotsClaimedLabel').textContent = claimed + ' of 500';
+  document.getElementById('spotsBarFill').style.width = ((claimed/500)*100).toFixed(1) + '%';
+}
+updateSpots();
+// Slowly tick down every few minutes
+setInterval(()=>{
+  if(spotsLeft > 1){ spotsLeft--; localStorage.setItem('cm_spots', spotsLeft); updateSpots(); }
+}, 4 * 60 * 1000);
+
+// ── COUNTDOWN TIMER ──
+const deadline = new Date(Date.now() + (2*24*60*60*1000) + (14*60*60*1000) + (37*60*1000));
+function updateCountdown(){
+  const diff = deadline - Date.now();
+  if(diff <= 0){ return; }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ── PRODUCTS ──
+const products = {
+  bundle: { name:"The 1% Close", tag:"Complete 4-Part Vault · Early Bird", item:"The 1% Close — Complete Bundle", origPrice:"$1,200", price:"$500", discount:"−$700", amount:500, isBundle:true,  url:"https://thecatherinemercer.gumroad.com/l/ekvvpl" },
+  p1:     { name:"The Psychology of Sales", tag:"Pillar One", item:"The Psychology of Sales & High-Ticket Closing", origPrice:"$300", price:"$300", discount:"", amount:300, isBundle:false, url:"https://thecatherinemercer.gumroad.com/l/xqljpc" },
+  p2:     { name:"The Mind-Reader Framework", tag:"Pillar Two", item:"The Mind-Reader Framework", origPrice:"$300", price:"$300", discount:"", amount:300, isBundle:false, url:"https://thecatherinemercer.gumroad.com/l/xindpw" },
+  p3:     { name:"The Buyer-First Playbook", tag:"Pillar Three", item:"The Buyer-First Playbook", origPrice:"$300", price:"$300", discount:"", amount:300, isBundle:false, url:"https://thecatherinemercer.gumroad.com/l/xlorz" },
+  p4:     { name:"The Breakthrough Blueprint", tag:"Pillar Four", item:"The Breakthrough Blueprint", origPrice:"$300", price:"$300", discount:"", amount:300, isBundle:false, url:"https://thecatherinemercer.gumroad.com/l/ualka" }
+};
+let currentProduct = 'bundle';
+
+function openModal(product){
+  currentProduct = product;
+  const p = products[product];
+  document.getElementById('modalProductTag').textContent = p.tag;
+  document.getElementById('modalProductName').textContent = p.name;
+  document.getElementById('orderOriginalLabel').textContent = p.item;
+  document.getElementById('orderOriginalPrice').textContent = p.origPrice;
+  document.getElementById('totalAmount').textContent = p.price;
+  document.getElementById('payAmount').textContent = p.price;
+  // Update Gumroad button URL
+  document.getElementById('gumroadBtn').href = p.url;
+  // Bundle: show discount + bonuses rows. Individual: hide them
+  document.getElementById('discountRow').style.display = p.isBundle ? 'flex' : 'none';
+  document.getElementById('orderOriginal').classList.toggle('strike', p.isBundle);
+  document.getElementById('bonusRow1').style.display = p.isBundle ? 'flex' : 'none';
+  document.getElementById('bonusRow2').style.display = p.isBundle ? 'flex' : 'none';
+  document.getElementById('modal-eb-strip').style.display = p.isBundle ? 'flex' : 'none';
+  document.getElementById('checkoutForm').style.display = 'block';
+  document.getElementById('checkoutModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  document.getElementById('checkoutModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.getElementById('checkoutModal').addEventListener('click', e=>{ if(e.target.id==='checkoutModal') closeModal(); });
+
+// ── SCROLL ANIMATIONS ──
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+  });
+},{threshold:0.1});
+document.querySelectorAll('.problem-item,.product-card,.testimonial').forEach(el=>{
+  el.style.opacity='0'; el.style.transform='translateY(20px)';
+  el.style.transition='opacity 0.6s ease,transform 0.6s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
